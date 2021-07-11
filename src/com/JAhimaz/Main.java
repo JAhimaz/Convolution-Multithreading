@@ -6,45 +6,62 @@ import com.JAhimaz.ioh.InputHandling;
 
 public class Main {
 
-    static Random random = new Random();
-    static Boolean randomValues = false;
+    // Static variables for referencing throughout the program.
+    static Random random = new Random(); // For generating Random Values
+    static Boolean randomValues = false; // Boolean on whether or not Random Values will be generated
 
+    // Main Method
     public static void main(String[] args) {
         AdminSetup();
     }
 
+    // Setup for the program, end-user enters values.
     public static void AdminSetup(){
         System.out.println("╔════════════════════════════════════════════════════════════════════════════╗");
         System.out.println("║                                                                            ║");
-        System.out.println("║                    >>> Convulation Multithreading <<<                      ║");
+        System.out.println("║                    >>> convolution Multithreading <<<                      ║");
         System.out.println("║                         >> ADMINISTRATOR SETUP <<                          ║");
         System.out.println("║                                                                            ║");
         System.out.println("╚════════════════════════════════════════════════════════════════════════════╝");
 
+        // Dimension of the initial image ranging from 1x1 to 8192x8192.
+        // Larger dimensions may take a longer time to accomplish as only 4 threads are in use.
         System.out.print("\nPlease Enter The Dimension of the Image (Square, so both sides are the same): ");
-        int dimensionOfImage = InputHandling.Integer(1, 8192);
-
-        System.out.print("\nHow Many Convulation Cycles Would You Like?: ");
+        int dimensionOfImage = InputHandling.Integer(1, 8192); 
+        
+        // The number of convolution cycles the end-user would like to go through (Errors will be caught when
+        // The program exceeds possible cycle limits).
+        System.out.print("\nHow Many convolution Cycles Would You Like?: ");
         int cycles = InputHandling.Integer(1, 50);
+        
 
+        // Simple choice on whether or not the user would want incrementing numbers as the values or
+        // random numbers from 0-255 (representing an image).
         System.out.print("\nWould you like to use Random Numbers as the Image? (1 = Yes, 2 = No): ");
         int choice = InputHandling.Integer(1, 2);
 
+
+        // Sets random values to true
         if(choice == 1){ randomValues = true; }
 
+
+        // Prompt telling the end-user all the information they have entered.
         System.out.println("\nThe Dimension of the Image is set to: " + dimensionOfImage);
-        System.out.println("The Number of Convulation Cycles: " + cycles);
+        System.out.println("The Number of convolution Cycles: " + cycles);
         System.out.println("Random Values: " + randomValues.toString().toUpperCase() + "\n");
 
         System.out.println("╔════════════════════════════════════════════════════════════════════════════╗");
         System.out.println("║                                                                            ║");
-        System.out.println("║                  >>> STARTING CONVULATION PROCESS <<<                      ║");
+        System.out.println("║                  >>> STARTING CONVOLUTION PROCESS <<<                      ║");
         System.out.println("║                                                                            ║");
         System.out.println("╚════════════════════════════════════════════════════════════════════════════╝");
-        Convulation(dimensionOfImage, cycles);
+
+        // Passing in, inputted variables to the convolution
+        convolutionProgram(dimensionOfImage, cycles);
     }
 
-    public static void Convulation(int dimensionOfImage, int cycles){
+    public static void convolutionProgram(int dimensionOfImage, int cycles){
+        // The Kernel used for convolution
         int[][] kernel = {{1,0,1},{0,1,0},{1,0,1}};
         int dimension = dimensionOfImage;                                                 
         int halfRowLength, halfColLength;
@@ -84,12 +101,16 @@ public class Main {
             System.out.println("");
         }
         System.out.println("\n");
-        System.out.println("Current Input Convulation Size: " + inputArray.length + "x" + inputArray[0].length);
+        // Inputs the size of the initial image (A square so obviously both sides)
+        System.out.println("Current Input convolution Size: " + inputArray.length + "x" + inputArray[0].length);
 
-        // create image array
+        // Creats an Array for the iamge
         Image img = new Image(inputArray, dimension);
 
+        // Counter for the number of convolutions, reason this is outside is because it's accessed inside the catch statement
         int counter = 0;
+
+        // Start the timer to measure the time it takes to go through the convolution process.
         long start = System.currentTimeMillis();
         try {
             for (counter = 0; counter < numberOfConv; counter++){           // repeat convolution process based on how the value specify above
@@ -111,6 +132,7 @@ public class Main {
                 Thread q3 = new Thread(new Convolution(img, 0, halfRowLength + 1, halfColLength, img.getMaxCol() -1, outputArray, kernel));
                 Thread q4 = new Thread(new Convolution(img, halfRowLength, img.getMaxRow() - 1, halfColLength, img.getMaxCol() - 1, outputArray, kernel));
 
+                // Starts all threads
                 q1.start(); q2.start(); q3.start(); q4.start();
 
                 while(q1.isAlive() || q2.isAlive() || q3.isAlive() || q4.isAlive()){}
@@ -119,6 +141,7 @@ public class Main {
                 System.out.println("                Convolutional Cycle " + (counter + 1) + " has been completed");
                 System.out.println("════════════════════════════════════════════════════════════════════════════════");
 
+                // Prints the output for each convolution
                 System.out.println("\n");
                 for (int x = 0; x < convRow; x++){
                     for (int y = 0; y < convCol; y++){
@@ -131,67 +154,54 @@ public class Main {
                 // set new image value, change array values and set new value for row and column
                 img.setNewPixel(outputArray);
                 img.setNewSize(convRow);
-                System.out.println("Current Output Convulation Size: " + outputArray.length + "x" + outputArray[0].length);
+                System.out.println("Current Output convolution Size: " + outputArray.length + "x" + outputArray[0].length);
             }
-            System.out.println("\nAll " + counter + "/" + numberOfConv + " Convulation Cycles Have Been Completed.");
+            System.out.println("\nAll " + counter + "/" + numberOfConv + " convolution Cycles Have Been Completed.");
             
         }catch(NegativeArraySizeException e){
+            // This catches if there is any convolutions that cannot be done due to the size of the image being too small
             System.out.println("\nThe Image cannot be Convoluated any further.");
             System.out.println("Ended at Current Cycle: " + counter + "/" + numberOfConv + "\n");
         }
 
+        // Ends the timer, to calculate the time it took.
         long end = System.currentTimeMillis();
         System.out.println("\nTime Taken: " + (end - start) + "ms\n");
     }
 }
 
-class Image{                                                    // Image class that holds the array with all the pixel value
+class Image{                                                    
     // includes methods to get number of rows and columns, pixel value
-    private int[][] pixels;                                     // and change value in the array and size of the array
+    private int[][] pixels;                                     
     private int maxRow;
     private int maxCol;
 
-    Image (int[][] pixels, int sizeNum) {       // initialize image object
+    // Constructor
+    Image (int[][] pixels, int sizeNum) {       
         this.pixels = pixels;
         this.maxCol = sizeNum;
         this.maxRow = sizeNum;
     }
 
-    public int getMaxRow() {                    // get max row number
-        return maxRow;
-    }
+    // GETTERS
 
-    public int getMaxCol() {                    // get max col number
-        return maxCol;
-    }
+    public int getMaxRow() { return maxRow; }
+    public int getMaxCol() { return maxCol; }
+    public int getPixel(int x, int y) { return pixels[x][y]; }
 
-    public int getPixel(int x, int y) {         // get pixel value
-        return pixels[x][y];
-    }
+    // SETTERS
 
-    public void setNewSize(int size) {          // set new row and col value
-        this.maxRow = size;
-        this.maxCol = size;
-    }
-
-    public void setNewPixel(int[][] pixels) {   // change array value
-        this.pixels = pixels;
-    }
-
+    public void setNewSize(int size) { this.maxRow = size; this.maxCol = size; }
+    public void setNewPixel(int[][] pixels) { this.pixels = pixels; }
 
 }
 
-class Convolution implements Runnable{                          // convolution class to conduct the convolution process
-    // uses the same convolution code from the appendix in the assignement question
-    private Image img;                                          // does the convolution process using values from a part of the image 
-    private int[][] imgArray;                                   // writes the value into a reference of the outputArray.
-    private int startRow;
-    private int endRow;
-    private int startCol;
-    private int endCol;
-    private int[][] quadrantOutputArray;
-    private int[][] kernel;
+class Convolution implements Runnable{ 
+    private Image img;                                                                       
+    private int startRow, endRow, startCol, endCol;
+    private int[][] quadrantOutputArray, kernel;
 
+    // Constructor
     Convolution(Image img, int startRow, int endRow, int startCol, int endCol, int[][] outputArray, int[][] kernel) {
         this.img = img;
         this.startRow = startRow;
@@ -202,10 +212,9 @@ class Convolution implements Runnable{                          // convolution c
         this.kernel = kernel;
     }
 
-    // Perform convolution (multiply the data from image with the kernel)
+    // Performing the Convolution
     @Override
     public void run(){
-
         for (int row = startRow + 1; row <= endRow - 1; row++){
             for (int col = startCol + 1; col <= endCol - 1; col++){
                 int topLeft = kernel[0][0] * img.getPixel(row-1, col-1);
