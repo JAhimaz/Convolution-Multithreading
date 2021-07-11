@@ -7,3 +7,5 @@ A command line program that can be used to perform a series of convolution on a 
 <hr>
 
 **Preview**
+
+![Preview](https://github.com/JAhimaz/Convolution-Multithreading/blob/main/Previews/Preview15.gif)
