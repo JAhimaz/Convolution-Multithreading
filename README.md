@@ -1,4 +1,4 @@
-# Convulation Multithreading
+# Convolution Multithreading
 
 ![Project Status](https://img.shields.io/badge/Project%20Status-Complete-green?style=for-the-badge&logo=github)
 
